@@ -8,12 +8,12 @@ class Main {
   void init(){
    
     // Array1: Vowel characters
-    char[] sub = new char[5];
-    sub[0] = 'G';
-    sub[1] = 'L';
+    char[] sub = new char[2];
+    sub[0] = 'a';
+    sub[1] = 'e';
     
     // Array2: Unicode characters
-    char[] sub2 = new char[5];
+    char[] sub2 = new char[2];
     sub2[0] = '\u2660';  // Spade
     sub2[1] = '\u2665';  // Heart
   
@@ -21,41 +21,42 @@ class Main {
     // Encoding the plaintext:
     String file = Input.readFile("Original.txt");
     
-    // Encode level 1 - Caesar Cipher (Shifting by 3)
-    String encodedMsg1 = caesarEncryption(file, 3);
+    // Encode level 1 - Substitution
+    String encodedMsg1 = subEncryption(file, sub, sub2);
     Input.writeFile("Encode1.txt", encodedMsg1);
     
-    // // Encode level 2 -Fillers 
-    String encodedMsg2 = addFillers(encodedMsg1);
+    // // Encode level 2 - Caesar Cipher (Shifting by 3)
+    String encodedMsg2 = caesarEncryption(encodedMsg1, 3);
     Input.writeFile("Encode2.txt", encodedMsg2);
    
-    // // Encode level 3 - Substitution 
-    String encodedMsg3 = reverse(encodedMsg2);
+    // // Encode level 3 - Fillers 
+    String encodedMsg3 = addFillers(encodedMsg2);
+    encodedMsg3 = reverse(encodedMsg3);
     Input.writeFile("Encode3.txt", encodedMsg3);
-
 
    
     // Decoding the ciphertext:
     String file2 = Input.readFile("Encode3.txt");
    
-    // Decode level 3  (reverse substitution)
+    // Decode level 3  (reverse + remove filler )
     String decodedMsg1 = reverse(file2);
+    decodedMsg1 = removeFillers(decodedMsg1);
     Input.writeFile("Decode1.txt", decodedMsg1);
-  
-    // Decode level 2 (remove fillers)
-    String decodedMsg2 = removeFillers(decodedMsg1);
+
+    // Decode level 2 (remove caesar cipher)
+    String decodedMsg2 = caesarDecryption(decodedMsg1, 3);
     Input.writeFile("Decode2.txt", decodedMsg2);
   
-    // Decode level 1 (reverse caesar cipher)
-    String decodedMsg3 = caesarDecryption(decodedMsg2, 3);
+    // Decode level 1 (reverse substitution)
+    String decodedMsg3 = subEncryption(decodedMsg2, sub2, sub);
     Input.writeFile("Decode3.txt", decodedMsg3);
   }
 
     // caesar encyrpt
     String caesarEncryption(String txt, int shift) {
       String build = "";
-      for (int i = 0; i < txt.length(); i++) {
-          char ch = txt.charAt(i);
+      for (int x = 0; x < txt.length(); x++) {
+          char ch = txt.charAt(x);
           build += (char)(ch + shift);
     }
     return build;
@@ -64,8 +65,8 @@ class Main {
   // caesar decrypt
   String caesarDecryption(String txt, int shift) {
     String build = "";
-    for (int i = 0; i < txt.length(); i++) {
-        char ch = txt.charAt(i);
+    for (int x = 0; x < txt.length(); x++) {
+        char ch = txt.charAt(x);
         build += (char)(ch - shift);
     }
     return build;
@@ -103,8 +104,8 @@ class Main {
   // Adding fillers
   String addFillers(String txt){
     String build = "";
-    for(int i = 0; i < txt.length(); i++){
-      build += txt.charAt(i);
+    for(int x = 0; x < txt.length(); x++){
+      build += txt.charAt(x);
       build += '#';
     }
     return build;
@@ -116,13 +117,13 @@ class Main {
   }
 
 
-  // Substitution encoding
+  // Substitution decoding
   String subEncryption(String s, char[] sub, char[] sub2){
     String build = "";
     char ch ='\0';
     int index=0;
    
-    for(int x=0; x<=s.length()-1; x++){
+    for(int x=0; x<s.length(); x++){
       ch = s.charAt(x);
       index = indexOf(ch,sub);
       if(index != -1){
